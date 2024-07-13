@@ -1,4 +1,4 @@
-import {checkEvery, ConfigCheckInterval, getCheckEvery, getCheckEveryInt, getPluginEnabled, setCheckEvery, setPluginEnabled} from "./config";
+import { checkEvery, ConfigCheckInterval, getCheckEvery, getCheckEveryInt, getPluginEnabled, setCheckEvery, setPluginEnabled } from "./config";
 
 function onClickMenuItem() {
 	// Write code here that should happen when the player clicks the menu item under the map icon.
@@ -84,9 +84,13 @@ function attemptLoanPaybackMonthly() {
 
 function attemptLoanPayback() {
 
+	if (!getPluginEnabled()) {
+		return;
+	}
+
 	checkIfLoanTakenOut();
 
-	if (!getPluginEnabled() || park.bankLoan === 0 || park.cash < ONE_THOUSAND_DOLLARS) {
+	if (park.bankLoan === 0 || park.cash < ONE_THOUSAND_DOLLARS) {
 		return;
 	}
 
@@ -130,6 +134,8 @@ function createSubscription() {
 			subscription = context.subscribe('interval.day', attemptLoanPaybackMonthly);
 			break;
 	}
+
+	oldBankLoan = park.bankLoan;
 }
 
 export function startup() {
