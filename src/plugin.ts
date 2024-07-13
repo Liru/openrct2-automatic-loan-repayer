@@ -4,7 +4,7 @@ import { startup } from "./startup";
 
 registerPlugin({
 	name: "Automatic Loan Repayer",
-	version: "0.1",
+	version: "0.1.0",
 	authors: [ "Liru" ],
 	type: "remote",
 	licence: "MIT",
