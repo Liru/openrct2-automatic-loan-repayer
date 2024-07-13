@@ -100,7 +100,9 @@ function attemptLoanPayback() {
 		return;
 	}
 
-	context.executeAction('parksetloan', { value: oldBankLoan - (payments * ONE_THOUSAND_DOLLARS) }, (res) => {
+	const amount = Math.min(payments * ONE_THOUSAND_DOLLARS, oldBankLoan) 
+
+	context.executeAction('parksetloan', { value: oldBankLoan - amount}, (res) => {
 		const { error } = res;
 		if (error !== 0) {
 			console.log(res);
