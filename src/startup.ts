@@ -29,6 +29,7 @@ function openWindow() {
 				width: 120,
 				height: 12,
 				onChange: function (isChecked: boolean) {
+					oldBankLoan = park.bankLoan
 					setPluginEnabled(isChecked);
 				},
 			}, {
