@@ -69,16 +69,6 @@ const ONE_THOUSAND_DOLLARS = 10_000
 
 var oldBankLoan: number = Number.MAX_VALUE
 
-function checkIfLoanTakenOut() {
-	if (park.bankLoan > oldBankLoan) {
-		// we took out a loan, stop autorepayment
-		park.postMessage({ type: 'money', text: 'Automatic loan repayment disabled due to loan being increased.' });
-		setPluginEnabled(false);
-	}
-
-	oldBankLoan = park.bankLoan
-}
-
 function attemptLoanPaybackMonthly() {
 	if (date.day === 1) {
 		attemptLoanPayback();
@@ -91,7 +81,15 @@ function attemptLoanPayback() {
 		return;
 	}
 
-	checkIfLoanTakenOut();
+	if (park.bankLoan > oldBankLoan) {
+		// we took out a loan, stop autorepayment
+		setPluginEnabled(false);
+		park.postMessage({ type: 'money', text: 'Automatic loan repayment disabled due to loan being increased.' });
+		return;
+	}
+
+	oldBankLoan = park.bankLoan
+
 
 	if (park.bankLoan === 0 || park.cash < ONE_THOUSAND_DOLLARS) {
 		return;
@@ -103,9 +101,9 @@ function attemptLoanPayback() {
 		return;
 	}
 
-	const amount = Math.min(payments * ONE_THOUSAND_DOLLARS, oldBankLoan) 
+	const amount = Math.min(payments * ONE_THOUSAND_DOLLARS, oldBankLoan)
 
-	context.executeAction('parksetloan', { value: oldBankLoan - amount}, (res) => {
+	context.executeAction('parksetloan', { value: oldBankLoan - amount }, (res) => {
 		const { error } = res;
 		if (error !== 0) {
 			console.log(res);
