@@ -1,12 +1,15 @@
 import { checkEvery, ConfigCheckInterval, getCheckEvery, getCheckEveryInt, getPluginEnabled, setCheckEvery, setPluginEnabled } from "./config";
 
-function onClickMenuItem() {
-	// Write code here that should happen when the player clicks the menu item under the map icon.
-	openWindow();
-}
+const CHECKBOX_NAME = "auto-loan-repayment-enable-checkbox"
+
+
 
 var handle: Window | undefined = undefined;
 var repaymentType: ConfigCheckInterval = "tick";
+
+const pluginCheckboxEnabled = "Automatically repays loans if possible."
+const pluginCheckboxDisabled = `${pluginCheckboxEnabled}\nCurrently disabled since no money is loaned.`
+
 
 function openWindow() {
 	if (handle === undefined) {
@@ -21,9 +24,10 @@ function openWindow() {
 			},
 			widgets: [{
 				type: 'checkbox',
+				name: CHECKBOX_NAME,
 				text: 'Enable auto repayment',
 				isChecked: getPluginEnabled(),
-				tooltip: 'Automatically repays loans if possible.',
+				tooltip: canEnablePlugin() ? pluginCheckboxEnabled : pluginCheckboxDisabled,
 				x: 5,
 				y: 20,
 				width: 120,
@@ -35,6 +39,7 @@ function openWindow() {
 						createSubscription();
 					}
 				},
+				isDisabled: !canEnablePlugin(),
 			}, {
 				type: 'label',
 				width: 150,
@@ -64,18 +69,33 @@ function openWindow() {
 	}
 }
 
+function updateEnableCheckbox() {
+	if (handle !== undefined) {
+		const widget = handle.findWidget(CHECKBOX_NAME) as CheckboxWidget;
+		widget.isDisabled = !canEnablePlugin();
+		widget.isChecked = getPluginEnabled();
+	}
+}
+
+function canEnablePlugin(): boolean {
+	return park.bankLoan > 0
+}
+
 // Yes, intentional. Money is measured in dimes; $1000 = 10,000 units.
 const ONE_THOUSAND_DOLLARS = 10_000
 
 var oldBankLoan: number = Number.MAX_VALUE
 
 function attemptLoanPaybackMonthly() {
+	updateEnableCheckbox()
 	if (date.day === 1) {
 		attemptLoanPayback();
 	}
 }
 
 function attemptLoanPayback() {
+
+	updateEnableCheckbox()
 
 	if (!getPluginEnabled()) {
 		return;
@@ -139,6 +159,11 @@ function createSubscription() {
 	}
 
 	oldBankLoan = park.bankLoan;
+}
+
+function onClickMenuItem() {
+	// Write code here that should happen when the player clicks the menu item under the map icon.
+	openWindow();
 }
 
 export function startup() {
