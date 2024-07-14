@@ -31,6 +31,9 @@ function openWindow() {
 				onChange: function (isChecked: boolean) {
 					oldBankLoan = park.bankLoan
 					setPluginEnabled(isChecked);
+					if (isChecked) {
+						createSubscription();
+					}
 				},
 			}, {
 				type: 'label',
@@ -147,6 +150,8 @@ export function startup() {
 	// TODO: Implement for multiplayer?
 	if (network.mode !== 'none') { return; }
 
+	// Disable on startup/load to avoid instantly repaying on load.
+	setPluginEnabled(false);
 	createSubscription()
 
 	// Register a menu item under the map icon:
